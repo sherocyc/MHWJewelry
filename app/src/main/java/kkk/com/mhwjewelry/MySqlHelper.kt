@@ -19,6 +19,7 @@ class MySqlHelper(ctx: Context) : ManagedSQLiteOpenHelper(ctx, "mydb") {
     }
 
     override fun onCreate(db: SQLiteDatabase) {
+
         db.createTable(JewelriesRecord::class.simpleName!!,
                 true,
                 "_id" to INTEGER + PRIMARY_KEY + AUTOINCREMENT + UNIQUE,
