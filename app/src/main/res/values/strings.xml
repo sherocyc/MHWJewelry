@@ -1,0 +1,95 @@
+<resources>
+    <string name="app_name">怪物猎人世界装饰珠炼金辅助工具</string>
+    <string name="action_add_record">添加记录</string>
+    <string name="input_jewelryname_hint1">装饰珠1</string>
+    <string name="input_jewelryname_hint2">装饰珠2</string>
+    <string name="input_jewelryname_hint3">装饰珠3</string>
+    <string name="ok">确定</string>
+    <string-array name="jewelry_names">
+        <item>耐毒</item>
+        <item>耐麻</item>
+        <item>耐爆</item>
+        <item>耐裂</item>
+        <item>耐防</item>
+        <item>攻击</item>
+        <item>防御</item>
+        <item>体力</item>
+        <item>早复</item>
+        <item>耐火</item>
+        <item>耐水</item>
+        <item>耐属</item>
+        <item>火炎</item>
+        <item>流水</item>
+        <item>毒</item>
+        <item>睡眠</item>
+        <item>达人</item>
+        <item>夺气</item>
+        <item>逆境</item>
+        <item>鼓笛</item>
+        <item>特射</item>
+        <item>炮术</item>
+        <item>炮手</item>
+        <item>无食</item>
+        <item>铁壁</item>
+        <item>速纳</item>
+        <item>有爱</item>
+        <item>持续</item>
+        <item>节食</item>
+        <item>快吃</item>
+        <item>研磨</item>
+        <item>爆师</item>
+        <item>茸好</item>
+        <item>加护</item>
+        <item>指示</item>
+        <item>植物</item>
+        <item>地学</item>
+        <item>投石</item>
+        <item>潜伏</item>
+        <item>烟复</item>
+        <item>沼渡</item>
+        <item>标本</item>
+        <item>嗅觉</item>
+        <item>威吓</item>
+        <item>治愈</item>
+        <item>绝路</item>
+        <item>整备</item>
+        <item>耐瘴</item>
+        <item>防风</item>
+        <item>耐震</item>
+        <item>超心</item>
+        <item>痛击</item>
+        <item>缩短</item>
+        <item>拔刀</item>
+        <item>重击</item>
+        <item>KO</item>
+        <item>飞燕</item>
+        <item>全开</item>
+        <item>挑战</item>
+        <item>无伤</item>
+        <item>威力</item>
+        <item>逆上</item>
+        <item>增弹</item>
+        <item>强走</item>
+        <item>体术</item>
+        <item>早气</item>
+        <item>回避</item>
+        <item>跳跃</item>
+        <item>浑身</item>
+        <item>滑走</item>
+        <item>昂扬</item>
+        <item>强弓</item>
+        <item>心眼</item>
+        <item>强壁</item>
+        <item>无击</item>
+        <item>防音</item>
+        <item>毒瓶</item>
+        <item>瘴瓶</item>
+        <item>解放</item>
+        <item>匠</item>
+        <item>耐冲</item>
+        <item>强弹</item>
+        <item>贯通</item>
+        <item>散弹</item>
+        <item>龙封</item>
+    </string-array>
+</resources>
