@@ -2,6 +2,7 @@ package kkk.com.mhwjewelry
 
 import android.app.Dialog
 import android.content.Context
+import android.database.sqlite.SQLiteDatabase
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
@@ -14,11 +15,14 @@ import kotlinx.android.synthetic.main.dialog_data_insert.*
 import org.jetbrains.anko.db.RowParser
 import org.jetbrains.anko.db.insert
 import org.jetbrains.anko.db.select
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
 
 class MainActivity : AppCompatActivity(), RowParser<JewelriesRecord> {
     val adapter: JewlriesAdapter
         get() = JewlriesAdapter(loadData())
-
+    val jewelryInfos = loadJewelryInfo();
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,6 +30,33 @@ class MainActivity : AppCompatActivity(), RowParser<JewelriesRecord> {
         setSupportActionBar(toolbar)
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = adapter
+    }
+
+    fun loadJewelryInfo(): List<JewelryInfo> {
+        val dbPath = (getFilesDir()?.getAbsolutePath() + "/databases/" + "jewelries.db")
+        if (!File(dbPath).exists()) {
+            File(getFilesDir()?.getAbsolutePath() + "/databases/").mkdir();
+            try {
+                val outStream = FileOutputStream(dbPath)
+                val inStream = getAssets().open("jewelries.db")
+                val buffer = ByteArray(1024)
+                var readBytes = inStream.read(buffer)
+                while (readBytes != -1) {
+                    outStream.write(buffer, 0, readBytes)
+                    readBytes = inStream.read(buffer)
+                }
+                inStream.close()
+                outStream.close()
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+        }
+        val db = SQLiteDatabase.openOrCreateDatabase(File(dbPath), null)
+        return db.select("jewelries").parseList(object : RowParser<JewelryInfo> {
+            override fun parseRow(columns: Array<Any?>): JewelryInfo {
+                return JewelryInfo(columns[0] as Long, columns[1] as String, columns[2] as Long, columns[3] as Long, columns[4] as String);
+            }
+        });
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -52,7 +83,6 @@ class MainActivity : AppCompatActivity(), RowParser<JewelriesRecord> {
         database.use {
             result = select(JewelriesRecord::class.simpleName!!).parseList(this@MainActivity);
         }
-
         return result;
     }
 
