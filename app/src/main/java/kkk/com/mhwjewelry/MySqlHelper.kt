@@ -22,9 +22,9 @@ class MySqlHelper(ctx: Context) : ManagedSQLiteOpenHelper(ctx, "mydb") {
         db.createTable(JewelriesRecord::class.simpleName!!,
                 true,
                 "_id" to INTEGER + PRIMARY_KEY + AUTOINCREMENT + UNIQUE,
-                "jewelry1" to TEXT,
-                "jewelry2" to TEXT,
-                "jewelry3" to TEXT
+                "jewelry1" to INTEGER,
+                "jewelry2" to INTEGER,
+                "jewelry3" to INTEGER
         )
     }
 
