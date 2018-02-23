@@ -5,6 +5,8 @@
     <string name="input_jewelryname_hint2">装饰珠2</string>
     <string name="input_jewelryname_hint3">装饰珠3</string>
     <string name="ok">确定</string>
+    <string name="misson_stepforward">任务推进</string>
+    <string name="do_alchemy">执行炼金</string>
     <string-array name="jewelry_names">
         <item>耐毒</item>
         <item>耐麻</item>

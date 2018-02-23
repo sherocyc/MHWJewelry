@@ -22,9 +22,14 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), View.OnClickListener {
+
     val adapter: JewlriesAdapter = JewlriesAdapter()
 
+    var currentIndex: Int = getSharedPreferences("jewl", Context.MODE_MULTI_PROCESS).getInt("missonIndex", 1);
+
+    val PASSED = 1;
+    val AVAILABLE = 1;
 
     companion object {
         val jewelryInfos: ArrayList<JewelryInfo> = ArrayList();
@@ -32,11 +37,13 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
+
+        btnMisson.setOnClickListener(this)
+        btnAlchemy.setOnClickListener(this)
 
         val dbPath = (getFilesDir()?.getAbsolutePath() + "/databases/" + "jewelries.db")
         if (!File(dbPath).exists()) {
@@ -73,6 +80,17 @@ class MainActivity : AppCompatActivity() {
         loadData();
     }
 
+    override fun onClick(v: View?) {
+        when (v) {
+            btnMisson -> {
+
+            }
+            btnAlchemy -> {
+
+            }
+        }
+    }
+
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -89,7 +107,6 @@ class MainActivity : AppCompatActivity() {
                 var dialog = DataInsertDialog(this);
                 dialog.setOnDismissListener {
                     loadData()
-                    adapter.notifyDataSetChanged();
                 }
                 dialog.create()
                 true
@@ -103,11 +120,20 @@ class MainActivity : AppCompatActivity() {
         database.use {
             result = select(JewelriesRecord::class.simpleName!!).parseList(object : RowParser<JewelriesRecord> {
                 override fun parseRow(columns: Array<Any?>): JewelriesRecord {
-                    return JewelriesRecord(columns[0] as Long, columns[1] as Long, columns[2] as Long, columns[3] as Long)
+                    return JewelriesRecord(columns[0] as Long,
+                            columns[1] as Long,
+                            columns[2] as Long,
+                            columns[3] as Long,
+                            when {
+                                (columns[0] as Long) < currentIndex -> PASSED
+                                else -> AVAILABLE
+                            })
                 }
             })
         }
+
         adapter.setDatas(result)
+        adapter.notifyDataSetChanged()
     }
 
 
@@ -145,7 +171,7 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    class DataInsertDialog(context: Context?) : Dialog(context,R.style.CustomDialog), View.OnClickListener, View.OnFocusChangeListener {
+    class DataInsertDialog(context: Context?) : Dialog(context, R.style.CustomDialog), View.OnClickListener, View.OnFocusChangeListener {
         var id1: Long? = 0;
         var id2: Long? = 0;
         var id3: Long? = 0;
@@ -157,11 +183,11 @@ class MainActivity : AppCompatActivity() {
             setContentView(R.layout.dialog_data_insert);
             ok.setOnClickListener(this)
             val names = jewelryInfos.map { it.name };
-            edit1.setAdapter(ArrayAdapter(context,R.layout.predict_item, names))
+            edit1.setAdapter(ArrayAdapter(context, R.layout.predict_item, names))
             edit1.onFocusChangeListener = this
-            edit2.setAdapter(ArrayAdapter(context,R.layout.predict_item, names))
+            edit2.setAdapter(ArrayAdapter(context, R.layout.predict_item, names))
             edit2.onFocusChangeListener = this
-            edit3.setAdapter(ArrayAdapter(context,R.layout.predict_item, names))
+            edit3.setAdapter(ArrayAdapter(context, R.layout.predict_item, names))
             edit3.onFocusChangeListener = this
             setCancelable(false)
             show()
@@ -196,6 +222,7 @@ class MainActivity : AppCompatActivity() {
             when (view?.id) {
                 R.id.ok -> {
                     context.database.use {
+                        onFocusChange(currentEditText, false)
                         insert(JewelriesRecord::class.simpleName!!,
                                 "jewelry1" to id1,
                                 "jewelry2" to id2,
