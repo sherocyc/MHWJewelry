@@ -21,7 +21,7 @@ class MySqlHelper(ctx: Context) : ManagedSQLiteOpenHelper(ctx, "mydb") {
     override fun onCreate(db: SQLiteDatabase) {
         db.createTable(JewelriesRecord::class.simpleName!!,
                 true,
-                "_id" to INTEGER + PRIMARY_KEY + AUTOINCREMENT + UNIQUE,
+                "id" to INTEGER + PRIMARY_KEY + AUTOINCREMENT + UNIQUE,
                 "jewelry1" to INTEGER,
                 "jewelry2" to INTEGER,
                 "jewelry3" to INTEGER

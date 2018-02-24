@@ -1,17 +1,17 @@
 package kkk.com.mhwjewelry
 
 import android.app.Dialog
+import android.content.ContentValues
 import android.content.Context
+import android.content.DialogInterface
 import android.database.sqlite.SQLiteDatabase
 import android.os.Bundle
+import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.*
-import android.widget.ArrayAdapter
-import android.widget.AutoCompleteTextView
-import android.widget.EditText
-import android.widget.TextView
+import android.widget.*
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
 import kotlinx.android.synthetic.main.dialog_data_insert.*
@@ -26,14 +26,45 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
     val adapter: JewlriesAdapter = JewlriesAdapter()
 
-    var currentIndex: Int = getSharedPreferences("jewl", Context.MODE_MULTI_PROCESS).getInt("missonIndex", 1);
+    var currentIndex: Long = -1
+        get()=field
+        set(value: Long) {
+            field = value
+            getSharedPreferences("jewl", Context.MODE_MULTI_PROCESS).edit().putLong("missonIndex", currentIndex).apply()
+        }
 
-    val PASSED = 1;
-    val AVAILABLE = 1;
+
+    var currentStepType = StepType.A
+        get()=field
+        set(value: StepType) {
+            field = value
+            getSharedPreferences("jewl", Context.MODE_MULTI_PROCESS).edit().putInt("stepmode", currentStepType.index).apply()
+        }
 
     companion object {
         val jewelryInfos: ArrayList<JewelryInfo> = ArrayList();
         val jewelryInfoMap: HashMap<Long, JewelryInfo> = HashMap();
+
+    }
+
+
+    enum class StepType(val index: Int, val steplength: Int) {
+        A(0, 2),
+        B(1, 1),
+        C(2, 1);
+
+        companion object {
+            fun fromIndex(index: Int): StepType = when (index) {
+                0 -> A
+                1 -> B
+                2 -> C
+                else -> A
+            }
+        }
+
+        operator fun plus(value: Int): StepType {
+            return StepType.fromIndex(index + value);
+        }
 
     }
 
@@ -44,6 +75,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
         btnMisson.setOnClickListener(this)
         btnAlchemy.setOnClickListener(this)
+        currentIndex = getSharedPreferences("jewl", Context.MODE_MULTI_PROCESS).getLong("missonIndex", 1)
+        currentStepType = StepType.fromIndex(getSharedPreferences("jewl", Context.MODE_MULTI_PROCESS).getInt("stepmode", 0))
 
         val dbPath = (getFilesDir()?.getAbsolutePath() + "/databases/" + "jewelries.db")
         if (!File(dbPath).exists()) {
@@ -73,7 +106,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             }))
             jewelryInfos.forEach { jewelryInfoMap[it.id] = it }
         }
-
+        db.close();
 
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = adapter
@@ -83,10 +116,13 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     override fun onClick(v: View?) {
         when (v) {
             btnMisson -> {
-
+                currentIndex = currentIndex + 1
+                currentStepType = currentStepType + 1
+                loadData()
             }
             btnAlchemy -> {
-
+                currentIndex = currentIndex + 1
+                loadData()
             }
         }
     }
@@ -125,8 +161,10 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                             columns[2] as Long,
                             columns[3] as Long,
                             when {
-                                (columns[0] as Long) < currentIndex -> PASSED
-                                else -> AVAILABLE
+                                (columns[0] as Long) < currentIndex -> JewelriesRecord.PASSED
+                                (columns[0] as Long) == currentIndex -> JewelriesRecord.CURRENT
+                                (columns[0] as Long) == currentIndex + currentStepType.steplength -> JewelriesRecord.NEXT
+                                else -> JewelriesRecord.AVAILABLE
                             })
                 }
             })
@@ -142,13 +180,58 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         val jewelry2: TextView get() = itemView.findViewById(R.id.jewelry2)
         val jewelry3: TextView get() = itemView.findViewById(R.id.jewelry3)
         val id: TextView get() = itemView.findViewById(R.id.id)
-        var jewelriesRecord: JewelriesRecord? = null;
+        val indicator: ImageView get() = itemView.findViewById(R.id.indicator)
+        val passedIndicator: View get() = itemView.findViewById(R.id.passedIndicator)
+
+        var jewelriesRecord: JewelriesRecord? = null
+        val context get() = itemView.context
+
+        init {
+            itemView?.setOnLongClickListener {
+                val builder = AlertDialog.Builder(context)
+                val dialog = builder.setItems(arrayOf("修改"), object : DialogInterface.OnClickListener {
+                    override fun onClick(p0: DialogInterface?, index: Int) {
+                        when (index) {
+                            0 -> {
+                                var dialog = DataInsertDialog(context, jewelriesRecord);
+                                dialog.setOnDismissListener {
+                                    (context as MainActivity).loadData()
+                                }
+                                dialog.create()
+                            }
+                        }
+                    }
+                }).create()
+                dialog.show()
+                true
+            }
+        }
+
         fun setData(jewelriesRecord: JewelriesRecord) {
             this.jewelriesRecord = jewelriesRecord
             id.text = jewelriesRecord.id.toString()
             jewelry1.text = jewelryInfoMap[jewelriesRecord.jewelry1]?.name
             jewelry2.text = jewelryInfoMap[jewelriesRecord.jewelry2]?.name
             jewelry3.text = jewelryInfoMap[jewelriesRecord.jewelry3]?.name
+            when (jewelriesRecord.status) {
+                JewelriesRecord.PASSED -> {
+                    passedIndicator.visibility = View.VISIBLE
+                    indicator.setImageResource(0)
+                }
+                JewelriesRecord.CURRENT -> {
+                    passedIndicator.visibility = View.GONE
+                    indicator.setImageResource(R.mipmap.arrow_red)
+                }
+                JewelriesRecord.NEXT -> {
+                    passedIndicator.visibility = View.GONE
+                    indicator.setImageResource(R.mipmap.arrow_gray)
+                }
+
+                else -> {
+                    passedIndicator.visibility = View.GONE
+                    indicator.setImageResource(0)
+                }
+            }
         }
     }
 
@@ -171,18 +254,26 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
     }
 
-    class DataInsertDialog(context: Context?) : Dialog(context, R.style.CustomDialog), View.OnClickListener, View.OnFocusChangeListener {
+    class DataInsertDialog(context: Context?, val updateRecord: JewelriesRecord? = null) : Dialog(context, R.style.CustomDialog), View.OnClickListener, View.OnFocusChangeListener {
         var id1: Long? = 0;
         var id2: Long? = 0;
         var id3: Long? = 0;
 
         var currentEditText: EditText? = null
-
         override fun create() {
             super.create()
             setContentView(R.layout.dialog_data_insert);
             ok.setOnClickListener(this)
             val names = jewelryInfos.map { it.name };
+            if (updateRecord != null) {
+                id1 = updateRecord.jewelry1
+                id2 = updateRecord.jewelry2
+                id3 = updateRecord.jewelry3
+
+                edit1.setText(jewelryInfoMap[updateRecord.jewelry1]?.name)
+                edit2.setText(jewelryInfoMap[updateRecord.jewelry2]?.name)
+                edit3.setText(jewelryInfoMap[updateRecord.jewelry3]?.name)
+            }
             edit1.setAdapter(ArrayAdapter(context, R.layout.predict_item, names))
             edit1.onFocusChangeListener = this
             edit2.setAdapter(ArrayAdapter(context, R.layout.predict_item, names))
@@ -222,11 +313,21 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             when (view?.id) {
                 R.id.ok -> {
                     context.database.use {
-                        onFocusChange(currentEditText, false)
-                        insert(JewelriesRecord::class.simpleName!!,
-                                "jewelry1" to id1,
-                                "jewelry2" to id2,
-                                "jewelry3" to id3)
+                        if (currentEditText != null)
+                            onFocusChange(currentEditText, false)
+                        if (updateRecord == null)
+                            insert(JewelriesRecord::class.simpleName!!,
+                                    "jewelry1" to id1,
+                                    "jewelry2" to id2,
+                                    "jewelry3" to id3)
+                        else {
+                            val contentValues = ContentValues()
+                            contentValues.put("jewelry1", id1)
+                            contentValues.put("jewelry2", id2)
+                            contentValues.put("jewelry3", id3)
+                            var result = update(JewelriesRecord::class.simpleName!!,
+                                    contentValues, "id=?", arrayOf(updateRecord.id.toString()))
+                        }
                         dismiss();
                     }
                 }
