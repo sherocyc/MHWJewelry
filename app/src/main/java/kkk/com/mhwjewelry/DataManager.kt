@@ -12,7 +12,14 @@ class DataManager() {
     companion object {
         val jewelryInfos: ArrayList<JewelryInfo> = ArrayList();
         val jewelryInfoMap: HashMap<Long, JewelryInfo> = HashMap();
+
+        val wishList: HashSet<Long> = HashSet<Long>()
+
+
         fun init(context: Context){
+            val list = context.getSharedPreferences("jewl", Context.MODE_MULTI_PROCESS).getStringSet("wishList", emptySet()).map { it.toLong() }.toSet()
+            wishList.addAll(list)
+
             val dbPath = (context.getFilesDir()?.getAbsolutePath() + "/databases/" + "jewelries.db")
             if (!File(dbPath).exists()) {
                 File(context.getFilesDir()?.getAbsolutePath() + "/databases/").mkdir();

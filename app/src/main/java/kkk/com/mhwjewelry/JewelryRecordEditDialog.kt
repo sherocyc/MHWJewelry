@@ -7,10 +7,10 @@ import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.EditText
-import kotlinx.android.synthetic.main.dialog_data_insert.*
-import org.jetbrains.anko.db.insert
 import kkk.com.mhwjewelry.DataManager.Companion.jewelryInfoMap
 import kkk.com.mhwjewelry.DataManager.Companion.jewelryInfos
+import kotlinx.android.synthetic.main.dialog_data_insert.*
+import org.jetbrains.anko.db.insert
 
 class JewelryRecordEditDialog(context: Context?, val updateRecord: JewelriesRecord? = null) : Dialog(context, R.style.CustomDialog), View.OnClickListener, View.OnFocusChangeListener {
     var id1: Long? = 0;
@@ -18,6 +18,8 @@ class JewelryRecordEditDialog(context: Context?, val updateRecord: JewelriesReco
     var id3: Long? = 0;
 
     var currentEditText: EditText? = null
+    val wishList: HashSet<Long> = HashSet<Long>()
+
     override fun create() {
         super.create()
         setContentView(R.layout.dialog_data_insert);

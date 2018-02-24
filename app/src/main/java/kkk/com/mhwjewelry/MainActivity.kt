@@ -2,6 +2,7 @@ package kkk.com.mhwjewelry
 
 import android.content.Context
 import android.content.DialogInterface
+import android.graphics.Color
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
@@ -11,6 +12,7 @@ import android.view.*
 import android.widget.ImageView
 import android.widget.TextView
 import kkk.com.mhwjewelry.DataManager.Companion.jewelryInfoMap
+import kkk.com.mhwjewelry.DataManager.Companion.wishList
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
 import org.jetbrains.anko.db.RowParser
@@ -104,6 +106,14 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                 dialog.create()
                 true
             }
+            R.id.action_wish_list -> {
+                var dialog = WishListDialog(this);
+                dialog.setOnDismissListener {
+                    loadData()
+                }
+                dialog.create()
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -170,6 +180,24 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             jewelry1.text = jewelryInfoMap[jewelriesRecord.jewelry1]?.name
             jewelry2.text = jewelryInfoMap[jewelriesRecord.jewelry2]?.name
             jewelry3.text = jewelryInfoMap[jewelriesRecord.jewelry3]?.name
+            if(wishList.contains(jewelriesRecord.jewelry1)){
+                jewelry1.setTextColor(Color.parseColor("#FF0000"))
+            }else{
+                jewelry1.setTextColor(Color.parseColor("#000000"))
+            }
+
+            if(wishList.contains(jewelriesRecord.jewelry2)){
+                jewelry2.setTextColor(Color.parseColor("#FF0000"))
+            }else{
+                jewelry2.setTextColor(Color.parseColor("#000000"))
+            }
+
+            if(wishList.contains(jewelriesRecord.jewelry3)){
+                jewelry3.setTextColor(Color.parseColor("#FF0000"))
+            }else{
+                jewelry3.setTextColor(Color.parseColor("#000000"))
+            }
+
             when (jewelriesRecord.status) {
                 JewelriesRecord.PASSED -> {
                     passedIndicator.visibility = View.VISIBLE
