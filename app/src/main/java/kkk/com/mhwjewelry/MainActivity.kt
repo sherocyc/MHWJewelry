@@ -22,18 +22,16 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     val adapter: JewlriesAdapter = JewlriesAdapter()
 
     var currentIndex: Long = -1
-        get() = field
         set(value) {
             field = value
-            getSharedPreferences("jewl", Context.MODE_MULTI_PROCESS).edit().putLong("missonIndex", currentIndex).apply()
+            getSharedPreferences("jewl", Context.MODE_PRIVATE).edit().putLong("missonIndex", currentIndex).apply()
         }
 
 
     var currentStepType = StepType.A
-        get() = field
         set(value) {
             field = value
-            getSharedPreferences("jewl", Context.MODE_MULTI_PROCESS).edit().putInt("stepmode", currentStepType.index).apply()
+            getSharedPreferences("jewl", Context.MODE_PRIVATE).edit().putInt("stepmode", currentStepType.index).apply()
         }
 
 
@@ -52,7 +50,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         }
 
         operator fun plus(value: Int): StepType {
-            return StepType.fromIndex(index + value);
+            return StepType.fromIndex(index + value)
         }
 
     }
@@ -64,18 +62,19 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
         btnMisson.setOnClickListener(this)
         btnAlchemy.setOnClickListener(this)
-        currentIndex = getSharedPreferences("jewl", Context.MODE_MULTI_PROCESS).getLong("missonIndex", 1)
-        currentStepType = StepType.fromIndex(getSharedPreferences("jewl", Context.MODE_MULTI_PROCESS).getInt("stepmode", 0))
+
+        currentIndex = getSharedPreferences("jewl", Context.MODE_PRIVATE).getLong("missonIndex", 1)
+        currentStepType = StepType.fromIndex(getSharedPreferences("jewl", Context.MODE_PRIVATE).getInt("stepmode", 0))
 
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = adapter
-        loadData();
+        loadData()
     }
 
     override fun onClick(v: View?) {
         when (v) {
             btnMisson -> {
-                currentIndex = currentIndex + 1
+                currentIndex = currentIndex + currentStepType.steplength
                 currentStepType = currentStepType + 1
                 loadData()
             }
@@ -99,7 +98,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         // as you specify a parent activity in AndroidManifest.xml.
         return when (item.itemId) {
             R.id.action_add_record -> {
-                var dialog = JewelryRecordEditDialog(this);
+                val dialog = JewelryRecordEditDialog(this)
                 dialog.setOnDismissListener {
                     loadData()
                 }
@@ -107,7 +106,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                 true
             }
             R.id.action_wish_list -> {
-                var dialog = WishListDialog(this);
+                val dialog = WishListDialog(this)
                 dialog.setOnDismissListener {
                     loadData()
                 }
@@ -119,7 +118,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     fun loadData() {
-        var result: List<JewelriesRecord> = ArrayList<JewelriesRecord>();
+        var result: List<JewelriesRecord> = ArrayList<JewelriesRecord>()
         database.use {
             result = select(JewelriesRecord::class.simpleName!!).parseList(object : RowParser<JewelriesRecord> {
                 override fun parseRow(columns: Array<Any?>): JewelriesRecord {
@@ -160,7 +159,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                     override fun onClick(p0: DialogInterface?, index: Int) {
                         when (index) {
                             0 -> {
-                                var dialog = JewelryRecordEditDialog(context, jewelriesRecord);
+                                val dialog = JewelryRecordEditDialog(context, jewelriesRecord)
                                 dialog.setOnDismissListener {
                                     (context as MainActivity).loadData()
                                 }
@@ -220,8 +219,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
-    class JewlriesAdapter() : RecyclerView.Adapter<JewelriesViewHolder>() {
-        val datas: ArrayList<JewelriesRecord> = ArrayList();
+    class JewlriesAdapter : RecyclerView.Adapter<JewelriesViewHolder>() {
+        val datas: ArrayList<JewelriesRecord> = ArrayList()
 
         fun setDatas(datas: Collection<JewelriesRecord>) {
             this.datas.clear()
@@ -234,7 +233,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         override fun getItemCount(): Int = datas.count()
 
         override fun onBindViewHolder(holder: JewelriesViewHolder?, position: Int) {
-            holder?.setData(datas[position]);
+            holder?.setData(datas[position])
         }
 
     }
