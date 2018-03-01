@@ -24,7 +24,7 @@ class JewelryRecordEditDialog(context: Context?, val updateRecord: JewelriesReco
         super.create()
         setContentView(R.layout.dialog_data_insert);
         ok.setOnClickListener(this)
-        val names = jewelryInfos.map { it.name };
+        val names = jewelryInfos.map { it.name }
         if (updateRecord != null) {
             id1 = updateRecord.jewelry1
             id2 = updateRecord.jewelry2
@@ -56,13 +56,17 @@ class JewelryRecordEditDialog(context: Context?, val updateRecord: JewelriesReco
     override fun onFocusChange(view: View?, hasFocus: Boolean) {
         if (!hasFocus) {
             currentEditText = null;
-            val input = (view as AutoCompleteTextView).text.toString();
-            val info = jewelryInfos.maxBy { stringCompare(it.name, input) }
-            view.setText(info?.name)
-            when (view) {
-                edit1 -> id1 = info?.id
-                edit2 -> id2 = info?.id
-                edit3 -> id3 = info?.id
+
+            val input = (view as AutoCompleteTextView).text.toString().toUpperCase()
+
+            if(!input.isBlank()) {
+                val info = jewelryInfos.maxBy { stringCompare(it.name, input) }
+                view.setText(info?.name)
+                when (view) {
+                    edit1 -> id1 = info?.id
+                    edit2 -> id2 = info?.id
+                    edit3 -> id3 = info?.id
+                }
             }
         } else {
             currentEditText = view as EditText;

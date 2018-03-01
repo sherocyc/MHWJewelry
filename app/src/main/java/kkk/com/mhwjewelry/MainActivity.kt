@@ -11,6 +11,7 @@ import android.support.v7.widget.RecyclerView
 import android.view.*
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import kkk.com.mhwjewelry.DataManager.Companion.jewelryInfoMap
 import kkk.com.mhwjewelry.DataManager.Companion.wishList
 import kotlinx.android.synthetic.main.activity_main.*
@@ -69,18 +70,24 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = adapter
         loadData()
+        recyclerView.scrollToPosition(currentIndex.toInt());
+
     }
 
     override fun onClick(v: View?) {
         when (v) {
             btnMisson -> {
                 currentIndex = currentIndex + currentStepType.steplength
+                Toast.makeText(this, "任务推进 进度+" + currentStepType.steplength, Toast.LENGTH_SHORT).show()
                 currentStepType = currentStepType + 1
                 loadData()
+                recyclerView.scrollToPosition(currentIndex.toInt())
             }
             btnAlchemy -> {
                 currentIndex = currentIndex + 1
+                Toast.makeText(this, "执行炼金 进度+1", Toast.LENGTH_SHORT).show()
                 loadData()
+                recyclerView.scrollToPosition(currentIndex.toInt())
             }
         }
     }
@@ -101,6 +108,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                 val dialog = JewelryRecordEditDialog(this)
                 dialog.setOnDismissListener {
                     loadData()
+                    recyclerView.scrollToPosition(recyclerView.adapter.itemCount);
                 }
                 dialog.create()
                 true
@@ -173,27 +181,34 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             }
         }
 
+        fun getShowName(id: Long): String? = when (id) {
+            0.toLong() -> {
+                "N/A"
+            }
+            else -> jewelryInfoMap[id]?.name
+        }
+
         fun setData(jewelriesRecord: JewelriesRecord) {
             this.jewelriesRecord = jewelriesRecord
             id.text = jewelriesRecord.id.toString()
-            jewelry1.text = jewelryInfoMap[jewelriesRecord.jewelry1]?.name
-            jewelry2.text = jewelryInfoMap[jewelriesRecord.jewelry2]?.name
-            jewelry3.text = jewelryInfoMap[jewelriesRecord.jewelry3]?.name
-            if(wishList.contains(jewelriesRecord.jewelry1)){
+            jewelry1.text = getShowName(jewelriesRecord.jewelry1)
+            jewelry2.text = getShowName(jewelriesRecord.jewelry2)
+            jewelry3.text = getShowName(jewelriesRecord.jewelry3)
+            if (wishList.contains(jewelriesRecord.jewelry1)) {
                 jewelry1.setTextColor(Color.parseColor("#FF0000"))
-            }else{
+            } else {
                 jewelry1.setTextColor(Color.parseColor("#000000"))
             }
 
-            if(wishList.contains(jewelriesRecord.jewelry2)){
+            if (wishList.contains(jewelriesRecord.jewelry2)) {
                 jewelry2.setTextColor(Color.parseColor("#FF0000"))
-            }else{
+            } else {
                 jewelry2.setTextColor(Color.parseColor("#000000"))
             }
 
-            if(wishList.contains(jewelriesRecord.jewelry3)){
+            if (wishList.contains(jewelriesRecord.jewelry3)) {
                 jewelry3.setTextColor(Color.parseColor("#FF0000"))
-            }else{
+            } else {
                 jewelry3.setTextColor(Color.parseColor("#000000"))
             }
 

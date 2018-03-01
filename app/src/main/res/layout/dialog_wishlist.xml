@@ -19,7 +19,9 @@
             android:orientation="horizontal">
             <AutoCompleteTextView   android:id="@+id/edit"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:minWidth="80dp"
+                android:textColor="@android:color/white"/>
             <Button android:id="@+id/add"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

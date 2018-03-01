@@ -7,6 +7,7 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import android.widget.TextView
 import kkk.com.mhwjewelry.DataManager.Companion.wishList
 import kotlinx.android.synthetic.main.dialog_wishlist.*
@@ -32,6 +33,8 @@ class WishListDialog(context: Context?) : Dialog(context, R.style.CustomDialog),
         super.create()
         setContentView(R.layout.dialog_wishlist)
         add.setOnClickListener(this)
+        val names = DataManager.jewelryInfos.map { it.name }
+        edit.setAdapter(ArrayAdapter(context, R.layout.predict_item, names))
         recyclerView.layoutManager = LinearLayoutManager(context)
         recyclerView.adapter = object : RecyclerView.Adapter<VH?>() {
 
@@ -63,11 +66,13 @@ class WishListDialog(context: Context?) : Dialog(context, R.style.CustomDialog),
     override fun onClick(v: View?) {
         when (v) {
             add -> {
-                val input = edit.text.toString()
+                val input = edit.text.toString().toUpperCase()
+                if(input.isEmpty()) return
                 val info = DataManager.jewelryInfos.maxBy { stringCompare(it.name, input) }
                 wishList.add(info!!.id)
                 context.getSharedPreferences("jewl", Context.MODE_PRIVATE).edit().putStringSet("wishList", wishList.map { it.toString() }.toSet()).apply()
                 recyclerView.adapter.notifyDataSetChanged()
+                edit.setText("")
             }
         }
     }
