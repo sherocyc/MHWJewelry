@@ -17,7 +17,7 @@ class DataManager() {
 
 
         fun init(context: Context){
-            val list = context.getSharedPreferences("jewl", Context.MODE_MULTI_PROCESS).getStringSet("wishList", emptySet()).map { it.toLong() }.toSet()
+            val list = context.getSharedPreferences("jewl", Context.MODE_PRIVATE).getStringSet("wishList", emptySet()).map { it.toLong() }.toSet()
             wishList.addAll(list)
 
             val dbPath = (context.getFilesDir()?.getAbsolutePath() + "/databases/" + "jewelries.db")

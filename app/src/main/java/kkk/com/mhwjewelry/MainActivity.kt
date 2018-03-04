@@ -19,7 +19,8 @@ import kotlinx.android.synthetic.main.content_main.*
 import org.jetbrains.anko.db.RowParser
 import org.jetbrains.anko.db.select
 
-class MainActivity : AppCompatActivity(), View.OnClickListener {
+class MainActivity : AppCompatActivity(), View.OnClickListener, View.OnLongClickListener {
+
     val adapter: JewlriesAdapter = JewlriesAdapter()
 
     var currentIndex: Long = -1
@@ -42,10 +43,11 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         C(2, 1);
 
         companion object {
-            fun fromIndex(index: Int): StepType = when (index) {
-                0 -> A
-                1 -> B
-                2 -> C
+            fun fromIndex(index: Int): StepType = when {
+                index < 0 -> C
+                index == 0 -> A
+                index == 1 -> B
+                index == 2 -> C
                 else -> A
             }
         }
@@ -54,6 +56,9 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             return StepType.fromIndex(index + value)
         }
 
+        operator fun minus(value: Int): StepType {
+            return StepType.fromIndex(index - value)
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -62,7 +67,9 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         setSupportActionBar(toolbar)
 
         btnMisson.setOnClickListener(this)
+        btnMisson.setOnLongClickListener(this)
         btnAlchemy.setOnClickListener(this)
+        btnAlchemy.setOnLongClickListener(this)
 
         currentIndex = getSharedPreferences("jewl", Context.MODE_PRIVATE).getLong("missonIndex", 1)
         currentStepType = StepType.fromIndex(getSharedPreferences("jewl", Context.MODE_PRIVATE).getInt("stepmode", 0))
@@ -90,6 +97,26 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                 recyclerView.scrollToPosition(currentIndex.toInt())
             }
         }
+    }
+
+    override fun onLongClick(v: View?): Boolean {
+        when (v) {
+            btnMisson -> {
+                currentStepType = currentStepType - 1
+
+                currentIndex = currentIndex - currentStepType.steplength
+                Toast.makeText(this, "任务推进回溯 进度 -" + currentStepType.steplength, Toast.LENGTH_SHORT).show()
+                loadData()
+                recyclerView.scrollToPosition(currentIndex.toInt())
+            }
+            btnAlchemy -> {
+                currentIndex = currentIndex - 1
+                Toast.makeText(this, "执行炼金回溯 进度-1", Toast.LENGTH_SHORT).show()
+                loadData()
+                recyclerView.scrollToPosition(currentIndex.toInt())
+            }
+        }
+        return true
     }
 
 
