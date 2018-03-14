@@ -92,6 +92,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, View.OnLongClick
             }
             btnAlchemy -> {
                 currentIndex = currentIndex + 1
+                currentStepType = currentStepType + 1
                 Toast.makeText(this, "执行炼金 进度+1", Toast.LENGTH_SHORT).show()
                 loadData()
                 recyclerView.scrollToPosition(currentIndex.toInt())
@@ -103,7 +104,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, View.OnLongClick
         when (v) {
             btnMisson -> {
                 currentStepType = currentStepType - 1
-
                 currentIndex = currentIndex - currentStepType.steplength
                 Toast.makeText(this, "任务推进回溯 进度 -" + currentStepType.steplength, Toast.LENGTH_SHORT).show()
                 loadData()
@@ -111,6 +111,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, View.OnLongClick
             }
             btnAlchemy -> {
                 currentIndex = currentIndex - 1
+                currentStepType = currentStepType - 1
                 Toast.makeText(this, "执行炼金回溯 进度-1", Toast.LENGTH_SHORT).show()
                 loadData()
                 recyclerView.scrollToPosition(currentIndex.toInt())
