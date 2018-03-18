@@ -149,6 +149,13 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, View.OnLongClick
                 dialog.create()
                 true
             }
+            R.id.stepType -> {
+                val builder = AlertDialog.Builder(this)
+                builder.setTitle(R.string.step_type)
+                builder.setItems(arrayOf("A(+2)","B(+1)","C(+1)"), DialogInterface.OnClickListener({ dialog, which -> currentStepType = StepType.fromIndex(which) }))
+                builder.show()
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }

@@ -13,4 +13,9 @@
         android:orderInCategory="100"
         android:title="@string/wish_list"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/stepType"
+        android:orderInCategory="100"
+        android:title="@string/step_type"
+        app:showAsAction="never" />
 </menu>
