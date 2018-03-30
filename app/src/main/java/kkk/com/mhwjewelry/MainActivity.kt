@@ -2,6 +2,7 @@ package kkk.com.mhwjewelry
 
 import android.content.Context
 import android.content.DialogInterface
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
@@ -17,6 +18,7 @@ import kkk.com.mhwjewelry.DataManager.Companion.wishList
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
 import org.jetbrains.anko.db.RowParser
+import org.jetbrains.anko.db.insert
 import org.jetbrains.anko.db.select
 
 class MainActivity : AppCompatActivity(), View.OnClickListener, View.OnLongClickListener {
@@ -67,9 +69,9 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, View.OnLongClick
         setSupportActionBar(toolbar)
 
         btnMisson.setOnClickListener(this)
-        btnMisson.setOnLongClickListener(this)
+//        btnMisson.setOnLongClickListener(this)
         btnAlchemy.setOnClickListener(this)
-        btnAlchemy.setOnLongClickListener(this)
+//        btnAlchemy.setOnLongClickListener(this)
 
         currentIndex = getSharedPreferences("jewl", Context.MODE_PRIVATE).getLong("missonIndex", 1)
         currentStepType = StepType.fromIndex(getSharedPreferences("jewl", Context.MODE_PRIVATE).getInt("stepmode", 0))
@@ -78,7 +80,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, View.OnLongClick
         recyclerView.adapter = adapter
         loadData()
         recyclerView.scrollToPosition(currentIndex.toInt());
-
     }
 
     override fun onClick(v: View?) {
@@ -86,6 +87,13 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, View.OnLongClick
             btnMisson -> {
                 currentIndex = currentIndex + currentStepType.steplength
                 Toast.makeText(this, "任务推进 进度+" + currentStepType.steplength, Toast.LENGTH_SHORT).show()
+                database.use{
+                    insert(TaskHistory::class.simpleName!!,
+                            "time" to System.currentTimeMillis(),
+                            "type" to 0,
+                            "stepLength" to currentStepType.steplength)
+                }
+
                 currentStepType = currentStepType + 1
                 loadData()
                 recyclerView.scrollToPosition(currentIndex.toInt())
@@ -94,6 +102,13 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, View.OnLongClick
                 currentIndex = currentIndex + 1
 //                currentStepType = currentStepType + 1
                 Toast.makeText(this, "执行炼金 进度+1", Toast.LENGTH_SHORT).show()
+                database.use{
+                    insert(TaskHistory::class.simpleName!!,
+                            "time" to System.currentTimeMillis(),
+                            "type" to 1,
+                            "stepLength" to 1)
+                }
+
                 loadData()
                 recyclerView.scrollToPosition(currentIndex.toInt())
             }
@@ -152,13 +167,16 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, View.OnLongClick
             R.id.stepType -> {
                 val builder = AlertDialog.Builder(this)
                 builder.setTitle(R.string.step_type)
-                builder.setItems(arrayOf("A(+2)", "B(+1)", "C(+1)"), DialogInterface.OnClickListener({ dialog, which ->
-                    {
-                        currentStepType = StepType.fromIndex(which)
-                        loadData()
-                    }
-                }))
+                builder.setItems(arrayOf("A(+2)", "B(+1)", "C(+1)"), { dialogInterface, i ->
+                    currentStepType = StepType.fromIndex(i)
+                    loadData()
+                })
+
                 builder.show()
+                true
+            }
+            R.id.taskHistory ->{
+                startActivity(Intent(this,TaskHistoryActivity::class.java))
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -168,6 +186,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, View.OnLongClick
     fun loadData() {
         var result: List<JewelriesRecord> = ArrayList<JewelriesRecord>()
         database.use {
+
             result = select(JewelriesRecord::class.simpleName!!).parseList(object : RowParser<JewelriesRecord> {
                 override fun parseRow(columns: Array<Any?>): JewelriesRecord {
                     return JewelriesRecord(columns[0] as Long,

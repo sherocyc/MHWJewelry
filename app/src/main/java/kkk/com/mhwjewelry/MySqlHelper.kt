@@ -26,6 +26,12 @@ class MySqlHelper(ctx: Context) : ManagedSQLiteOpenHelper(ctx, "mydb") {
                 "jewelry2" to INTEGER,
                 "jewelry3" to INTEGER
         )
+        db.createTable(TaskHistory::class.simpleName!!,
+                true,
+                "id" to INTEGER + PRIMARY_KEY + AUTOINCREMENT + UNIQUE,
+                "time" to INTEGER,
+                "type" to INTEGER,
+                "stepLength" to INTEGER)
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {

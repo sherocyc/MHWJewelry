@@ -10,6 +10,7 @@
     <string name="add">添加</string>
     <string name="wish_list">愿望单</string>
     <string name="step_type">步进类型</string>
+    <string name="tasthistory">任务历史</string>
     <string-array name="jewelry_names">
         <item>耐毒</item>
         <item>耐麻</item>
