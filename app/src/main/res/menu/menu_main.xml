@@ -24,4 +24,10 @@
         android:orderInCategory="100"
         android:title="@string/tasthistory"
         app:showAsAction="never" />
+
+    <item
+        android:id="@+id/revert"
+        android:orderInCategory="100"
+        android:title="撤销"
+        app:showAsAction="never" />
 </menu>

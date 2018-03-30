@@ -80,8 +80,19 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, View.OnLongClick
         recyclerView.adapter = adapter
         loadData()
         recyclerView.scrollToPosition(currentIndex.toInt());
+        fab.setOnClickListener { view ->
+            addRecord()
+        }
     }
 
+    fun addRecord(){
+        val dialog = JewelryRecordEditDialog(this)
+        dialog.setOnDismissListener {
+            loadData()
+            recyclerView.scrollToPosition(recyclerView.adapter.itemCount);
+        }
+        dialog.create()
+    }
     override fun onClick(v: View?) {
         when (v) {
             btnMisson -> {
@@ -148,12 +159,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, View.OnLongClick
         // as you specify a parent activity in AndroidManifest.xml.
         return when (item.itemId) {
             R.id.action_add_record -> {
-                val dialog = JewelryRecordEditDialog(this)
-                dialog.setOnDismissListener {
-                    loadData()
-                    recyclerView.scrollToPosition(recyclerView.adapter.itemCount);
-                }
-                dialog.create()
+                addRecord()
                 true
             }
             R.id.action_wish_list -> {
@@ -177,6 +183,43 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, View.OnLongClick
             }
             R.id.taskHistory ->{
                 startActivity(Intent(this,TaskHistoryActivity::class.java))
+                true
+            }
+            R.id.revert ->{
+                database.use {
+                    try {
+                        val last = select(TaskHistory::class.simpleName!!).parseList(object : RowParser<TaskHistory> {
+                            override fun parseRow(columns: Array<Any?>): TaskHistory {
+                                return TaskHistory(columns[0] as Long,
+                                        columns[1] as Long,
+                                        columns[2] as Long,
+                                        columns[3] as Long)
+                            }
+                        }).last()
+                        delete(TaskHistory::class.simpleName!!,"id = ?", arrayOf(last.id.toString()))
+
+                        when (last.type) {
+                            0.toLong() -> {
+                                currentStepType = currentStepType - 1
+                                currentIndex = currentIndex - currentStepType.steplength
+//                            Toast.makeText(MainActivity@this, "任务推进回溯 进度 -" + currentStepType.steplength, Toast.LENGTH_SHORT).show()
+                                loadData()
+                                recyclerView.scrollToPosition(currentIndex.toInt())
+                            }
+                            1.toLong() -> {
+                                currentIndex = currentIndex - 1
+//                currentStepType = currentStepType - 1
+//                            Toast.makeText(MainActivity@this, "执行炼金回溯 进度-1", Toast.LENGTH_SHORT).show()
+                                loadData()
+                                recyclerView.scrollToPosition(currentIndex.toInt())
+                            }
+                        }
+                    }catch (e:NoSuchElementException){
+                    }
+
+
+                }
+
                 true
             }
             else -> super.onOptionsItemSelected(item)
