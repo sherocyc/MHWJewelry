@@ -38,7 +38,7 @@ class TaskHistoryActivity : AppCompatActivity() {
                 }
             })
         }
-        return result;
+        return result.reversed();
     }
 
     class TaskHistoryViewHolder(itemView: View?) : RecyclerView.ViewHolder(itemView) {
