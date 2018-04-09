@@ -8,9 +8,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import org.jetbrains.anko.AnkoComponent
+import org.jetbrains.anko.AnkoContext
 import org.jetbrains.anko.db.RowParser
 import org.jetbrains.anko.db.select
 import org.jetbrains.anko.recyclerview.v7.recyclerView
+import org.jetbrains.anko.setContentView
 import org.jetbrains.anko.verticalLayout
 import java.util.*
 
@@ -19,14 +22,22 @@ class TaskHistoryActivity : AppCompatActivity() {
     val taskHistoryAdapter: TaskHistoryAdapter
         get() = TaskHistoryAdapter(loadData())
 
+    private class TaskHistoryActivityUI : AnkoComponent<TaskHistoryActivity> {
+        override fun createView(ui: AnkoContext<TaskHistoryActivity>): View =
+                ui.apply {
+                    verticalLayout {
+                        recyclerView {
+                            layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+                            adapter = ui.owner.taskHistoryAdapter
+                        }
+                    }
+                }.view
+    }
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        verticalLayout {
-            recyclerView {
-                layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-                adapter = taskHistoryAdapter
-            }
-        }
+        TaskHistoryActivityUI().setContentView(this)
     }
 
     fun loadData(): List<TaskHistory> {
