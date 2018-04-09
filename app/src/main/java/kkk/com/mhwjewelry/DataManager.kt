@@ -2,6 +2,8 @@ package kkk.com.mhwjewelry
 
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
+import com.google.gson.JsonArray
+import com.google.gson.JsonParser
 import org.jetbrains.anko.db.RowParser
 import org.jetbrains.anko.db.select
 import java.io.File
@@ -13,12 +15,10 @@ class DataManager() {
         val jewelryInfos: ArrayList<JewelryInfo> = ArrayList();
         val jewelryInfoMap: HashMap<Long, JewelryInfo> = HashMap();
 
-        val wishList: HashSet<Long> = HashSet<Long>()
+        var wishList: HashSet<Long> = HashSet()
 
-
-        fun init(context: Context){
-            val list = context.getSharedPreferences("jewl", Context.MODE_PRIVATE).getStringSet("wishList", emptySet()).map { it.toLong() }.toSet()
-            wishList.addAll(list)
+        fun init(context: Context) {
+            getWishList(context)
 
             val dbPath = (context.getFilesDir()?.getAbsolutePath() + "/databases/" + "jewelries.db")
             if (!File(dbPath).exists()) {
@@ -49,6 +49,20 @@ class DataManager() {
                 jewelryInfos.forEach { jewelryInfoMap[it.id] = it }
             }
             db.close();
+        }
+
+        fun getWishList(context: Context){
+            val wishListString = context.getSharedPreferences("jewl", Context.MODE_PRIVATE).getString("wishList2", "")
+            wishList.clear()
+            try {
+                JsonParser().parse(wishListString)?.asJsonArray?.forEach { wishList.add(it.asLong) }
+            }catch (e:Exception){}
+        }
+
+        fun saveWishList(context: Context) {
+            val jsonArray = JsonArray()
+            wishList.forEach { jsonArray.add(it) }
+            context.getSharedPreferences("jewl", Context.MODE_PRIVATE).edit().putString("wishList2", jsonArray.toString()).apply()
         }
     }
 

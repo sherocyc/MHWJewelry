@@ -19,34 +19,31 @@ class WishListDialog(context: Context?) : Dialog(context, R.style.CustomDialog),
         var id: Long = 0
             set(value) {
                 field = value
-                itemView.findViewById<TextView>(R.id.name).text = DataManager.jewelryInfoMap[value]?.name
+                (itemView.findViewById(R.id.name) as TextView).text = DataManager.jewelryInfoMap[value]?.name
             }
         init{
-            itemView.findViewById<View>(R.id.btnDelete).setOnClickListener {
+            (itemView.findViewById(R.id.btnDelete) as View).setOnClickListener {
                 wishList.remove(id)
-                context.getSharedPreferences("jewl", Context.MODE_PRIVATE).edit().putStringSet("wishList", wishList.map { it.toString() }.toSet()).apply()
-                recyclerView.adapter.notifyDataSetChanged()
+                DataManager.saveWishList(context)
             }
         }
     }
-    override fun create() {
-        super.create()
+    init {
         setContentView(R.layout.dialog_wishlist)
         add.setOnClickListener(this)
         val names = DataManager.jewelryInfos.map { it.name }
         edit.setAdapter(ArrayAdapter(context, R.layout.predict_item, names))
         recyclerView.layoutManager = LinearLayoutManager(context)
         recyclerView.adapter = object : RecyclerView.Adapter<VH?>() {
-
-            override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): VH? =
-                    VH(LayoutInflater.from(parent?.context).inflate(R.layout.wishlist_item, parent, false))
+            override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH =
+                    VH(LayoutInflater.from(parent.context).inflate(R.layout.wishlist_item, parent, false))
 
             override fun getItemCount(): Int =
                     DataManager.wishList.size
 
 
-            override fun onBindViewHolder(holder: VH?, position: Int) {
-                holder?.id = DataManager.wishList.toList().sorted()[position]
+            override fun onBindViewHolder(holder: VH, position: Int) {
+                holder.id = DataManager.wishList.toList().sorted()[position]
             }
         }
 
@@ -70,7 +67,7 @@ class WishListDialog(context: Context?) : Dialog(context, R.style.CustomDialog),
                 if(input.isEmpty()) return
                 val info = DataManager.jewelryInfos.maxBy { stringCompare(it.name, input) }
                 wishList.add(info!!.id)
-                context.getSharedPreferences("jewl", Context.MODE_PRIVATE).edit().putStringSet("wishList", wishList.map { it.toString() }.toSet()).apply()
+                DataManager.saveWishList(context)
                 recyclerView.adapter.notifyDataSetChanged()
                 edit.setText("")
             }

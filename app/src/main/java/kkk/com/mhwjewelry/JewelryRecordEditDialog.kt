@@ -20,8 +20,7 @@ class JewelryRecordEditDialog(context: Context?, val updateRecord: JewelriesReco
     var currentEditText: EditText? = null
     val wishList: HashSet<Long> = HashSet<Long>()
 
-    override fun create() {
-        super.create()
+    init{
         setContentView(R.layout.dialog_data_insert);
         ok.setOnClickListener(this)
         val names = jewelryInfos.map { it.name }

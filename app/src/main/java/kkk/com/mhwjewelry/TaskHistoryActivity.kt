@@ -8,22 +8,25 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import kotlinx.android.synthetic.main.activity_taskhistory.*
 import org.jetbrains.anko.db.RowParser
 import org.jetbrains.anko.db.select
+import org.jetbrains.anko.recyclerview.v7.recyclerView
+import org.jetbrains.anko.verticalLayout
 import java.util.*
 
 class TaskHistoryActivity : AppCompatActivity() {
 
-    val adapter: TaskHistoryAdapter
+    val taskHistoryAdapter: TaskHistoryAdapter
         get() = TaskHistoryAdapter(loadData())
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_taskhistory)
-        recyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        recyclerView.adapter = adapter;
+        verticalLayout {
+            recyclerView {
+                layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+                adapter = taskHistoryAdapter
+            }
+        }
     }
 
     fun loadData(): List<TaskHistory> {
@@ -42,9 +45,9 @@ class TaskHistoryActivity : AppCompatActivity() {
     }
 
     class TaskHistoryViewHolder(itemView: View?) : RecyclerView.ViewHolder(itemView) {
-        val time: TextView = itemView!!.findViewById(R.id.time)
-        val type: TextView = itemView!!.findViewById(R.id.type)
-        val stepLength: TextView = itemView!!.findViewById(R.id.stepLength)
+        val time: TextView = itemView!!.findViewById(R.id.time) as TextView
+        val type: TextView = itemView!!.findViewById(R.id.type) as TextView
+        val stepLength: TextView = itemView!!.findViewById(R.id.stepLength) as TextView
 
         fun setData(data: TaskHistory) {
             time.text = Date(data.time).toString()
@@ -58,13 +61,13 @@ class TaskHistoryActivity : AppCompatActivity() {
     }
 
     class TaskHistoryAdapter(val datas: List<TaskHistory>) : RecyclerView.Adapter<TaskHistoryViewHolder>() {
-        override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): TaskHistoryViewHolder =
-                TaskHistoryViewHolder(LayoutInflater.from(parent?.context).inflate(R.layout.taskhistory_item, parent, false))
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskHistoryViewHolder =
+                TaskHistoryViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.taskhistory_item, parent, false))
 
         override fun getItemCount(): Int = datas.size
 
-        override fun onBindViewHolder(holder: TaskHistoryViewHolder?, position: Int) {
-            holder?.setData(datas[position])
+        override fun onBindViewHolder(holder: TaskHistoryViewHolder, position: Int) {
+            holder.setData(datas[position])
         }
     }
 }

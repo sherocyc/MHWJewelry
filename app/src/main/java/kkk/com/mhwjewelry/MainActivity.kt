@@ -80,7 +80,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, View.OnLongClick
         recyclerView.adapter = adapter
         loadData()
         recyclerView.scrollToPosition(currentIndex.toInt());
-        fab.setOnClickListener { view ->
+        fab.setOnClickListener { _ ->
             addRecord()
         }
     }
@@ -91,7 +91,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, View.OnLongClick
             loadData()
             recyclerView.scrollToPosition(recyclerView.adapter.itemCount);
         }
-        dialog.create()
     }
     override fun onClick(v: View?) {
         when (v) {
@@ -167,13 +166,12 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, View.OnLongClick
                 dialog.setOnDismissListener {
                     loadData()
                 }
-                dialog.create()
                 true
             }
             R.id.stepType -> {
                 val builder = AlertDialog.Builder(this)
                 builder.setTitle(R.string.step_type)
-                builder.setItems(arrayOf("A(+2)", "B(+1)", "C(+1)"), { dialogInterface, i ->
+                builder.setItems(arrayOf("A(+2)", "B(+1)", "C(+1)"), { _, i ->
                     currentStepType = StepType.fromIndex(i)
                     loadData()
                 })
@@ -252,12 +250,12 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, View.OnLongClick
 
 
     class JewelriesViewHolder(itemView: View?) : RecyclerView.ViewHolder(itemView) {
-        val jewelry1: TextView get() = itemView.findViewById(R.id.jewelry1)
-        val jewelry2: TextView get() = itemView.findViewById(R.id.jewelry2)
-        val jewelry3: TextView get() = itemView.findViewById(R.id.jewelry3)
-        val id: TextView get() = itemView.findViewById(R.id.id)
-        val indicator: ImageView get() = itemView.findViewById(R.id.indicator)
-        val passedIndicator: View get() = itemView.findViewById(R.id.passedIndicator)
+        val jewelry1: TextView get() = itemView.findViewById(R.id.jewelry1) as TextView
+        val jewelry2: TextView get() = itemView.findViewById(R.id.jewelry2) as TextView
+        val jewelry3: TextView get() = itemView.findViewById(R.id.jewelry3) as TextView
+        val id: TextView get() = itemView.findViewById(R.id.id) as TextView
+        val indicator: ImageView get() = itemView.findViewById(R.id.indicator) as ImageView
+        val passedIndicator: View get() = itemView.findViewById(R.id.passedIndicator) as View
 
         var jewelriesRecord: JewelriesRecord? = null
         val context get() = itemView.context
@@ -273,7 +271,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, View.OnLongClick
                                 dialog.setOnDismissListener {
                                     (context as MainActivity).loadData()
                                 }
-                                dialog.create()
                             }
                         }
                     }
@@ -344,13 +341,13 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, View.OnLongClick
             this.datas.addAll(datas)
         }
 
-        override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): JewelriesViewHolder =
-                JewelriesViewHolder(LayoutInflater.from(parent?.context).inflate(R.layout.jewelrylist_item, parent, false))
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): JewelriesViewHolder =
+                JewelriesViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.jewelrylist_item, parent, false))
 
         override fun getItemCount(): Int = datas.count()
 
-        override fun onBindViewHolder(holder: JewelriesViewHolder?, position: Int) {
-            holder?.setData(datas[position])
+        override fun onBindViewHolder(holder: JewelriesViewHolder, position: Int) {
+            holder.setData(datas[position])
         }
 
     }
